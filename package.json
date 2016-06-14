@@ -1,0 +1,25 @@
+{
+  "name": "stocker-watchdog",
+  "version": "1.0.0",
+  "description": "stocker watchdog for sending alerts",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.heroku.com/stocker-watchdog.git"
+  },
+  "keywords": [
+    "stock"
+  ],
+  "author": "rol7",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^3.0.4",
+    "nodemailer": "^2.4.2",
+    "request": "^2.72.0"
+  },
+  "devDependencies": {}
+}
