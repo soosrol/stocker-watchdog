@@ -12,7 +12,14 @@ var jsonprefix = "// ";
 
 var latestQuotes;
 
-var sendEmail = function(smtpTransport, alert, currentPrice){
+
+var deleteAlert = function(id, userid){
+  console.log("Deleting id: " + id + " - userid: " + userid);
+    firebase.database().ref().child('user-alerts').child(userid).child(id).remove();
+    firebase.database().ref().child('alerts').child(id).remove();  
+}
+
+var sendEmail = function(smtpTransport, alert, currentPrice, alertId){
   // Construct message
   var bodyStr = "Your stock price alert for " + alert.symbol + " has been triggered.\r\n";
   bodyStr+= "The current quote for " + alert.symbol + " is $" + currentPrice + ".\r\n";
@@ -33,13 +40,18 @@ var sendEmail = function(smtpTransport, alert, currentPrice){
   }
   
   // send mail with defined transport object 
-  smtpTransport.sendMail(mailOptions, function(error, response){
+  return smtpTransport.sendMail(mailOptions, function(error, response){
     if(error){
         console.log(error);
         return false;
     }else{
         console.log("Message sent: " + response.message);
-        return true;        
+        console.log("+++Repeat: " + alert.repeat);
+        if(alert.repeat == "ONCE"){
+          //deleteAlert
+          deleteAlert(alertId, alert.uid);
+        }
+           
     }
 });
 
@@ -85,10 +97,7 @@ var sendAlerts = function(quotes, alerts){
       var price = quotes[a.symbol];
                 
       if(evaluateRule(a, price)){
-        var emailSuccess = sendEmail(smtpTransport, a, price);
-        if(emailSuccess){
-          //deleteAlert
-        }
+        sendEmail(smtpTransport, a, price, key);        
       }
     }
   
@@ -102,9 +111,7 @@ var getQuotes = function(symbols, alerts){
   console.log("quotes url: " + url);
   var request = require('request');
   request(url, function (error, response, body) {
-  			
         var quotesList = JSON.parse(response.body.replace("// ", ""));
-        
         var latestQuotes = {};
         quotesList.forEach(function(quote){
           latestQuotes[quote.t] = quote.l;
@@ -136,18 +143,13 @@ var watcher = function(){
      
     getQuotes(symbolsToWatch, alerts);
   }).catch(function(error) {
-    console.log('Elbaszodott: ', error);
+    console.log('Watcher error: ', error);
   });
-  
-  
- 
- 
-  
   
 };
 
 
 
 //Start watcher		
-setInterval(watcher, pollFrequency);
-//watcher(); //use setinterval when not debugging anymore
+//setInterval(watcher, pollFrequency);
+watcher(); //use setinterval when not debugging anymore
