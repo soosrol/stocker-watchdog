@@ -5,7 +5,7 @@ var app = firebase.initializeApp({
   databaseURL: "https://stocker-56fb8.firebaseio.com"
 });
 
-var pollFrequency = 60000; //change this when not testing anymore
+var pollFrequency = 600000; //change this when not testing anymore
 var counter = 0;
 var quoteUrl = "http://www.google.com/finance/info?client=ig&q={SYMBOLS}";
 var jsonprefix = "// ";
